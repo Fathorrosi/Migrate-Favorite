@@ -34,7 +34,7 @@ public class PermataFavoriteResourcedb2 {
     public void getAllPermataFavorite() {
 //        List allPermataFavorite = (List) permataFavoriteService.getAllPermataFavorite();
         for(PermataFavorite permataFavorite : mySqlPermataFavoriteService.getAllPermataFavorite()) {
-            System.out.println("GCN: " + permataFavorite.getGcn());
+            System.out.println("GCN: " + permataFavorite.getCustRefId());
 
             System.out.println("================================");
         }

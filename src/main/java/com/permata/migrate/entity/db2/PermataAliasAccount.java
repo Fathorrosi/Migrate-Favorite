@@ -6,11 +6,13 @@ import java.sql.Timestamp;
 /**
  * Created by HP on 04/11/2019.
  */
+//@Entity
+//@Table(name = "PERMATA_ALIAS_ACCOUNT", schema = "SONEDBA", catalog = "")
 @Entity
-@Table(name = "PERMATA_ALIAS_ACCOUNT", schema = "SONEDBA", catalog = "")
+@Table(name = "PERMATA_ALIAS_ACCOUNT")
 @IdClass(PermataAliasAccountPK.class)
 public class PermataAliasAccount {
-    private String userId;
+//    private String userId;
     private String gcn;
     private String categoryAlias;
     private String accountNumber;
@@ -18,16 +20,16 @@ public class PermataAliasAccount {
     private String updatedBy;
     private Timestamp updatedTimestamp;
     private String status;
-
-    @Id
-    @Column(name = "USER_ID", nullable = false, insertable = true, updatable = true, length = 100)
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+//
+//    @Id
+//    @Column(name = "USER_ID", nullable = false, insertable = true, updatable = true, length = 100)
+//    public String getUserId() {
+//        return userId;
+//    }
+//
+//    public void setUserId(String userId) {
+//        this.userId = userId;
+//    }
 
     @Id
     @Column(name = "GCN", nullable = false, insertable = true, updatable = true, length = 50)
@@ -106,7 +108,7 @@ public class PermataAliasAccount {
 
         PermataAliasAccount that = (PermataAliasAccount) o;
 
-        if (userId != null ? !userId.equals(that.userId) : that.userId != null) return false;
+//        if (userId != null ? !userId.equals(that.userId) : that.userId != null) return false;
         if (gcn != null ? !gcn.equals(that.gcn) : that.gcn != null) return false;
         if (categoryAlias != null ? !categoryAlias.equals(that.categoryAlias) : that.categoryAlias != null)
             return false;
@@ -123,8 +125,8 @@ public class PermataAliasAccount {
 
     @Override
     public int hashCode() {
-        int result = userId != null ? userId.hashCode() : 0;
-        result = 31 * result + (gcn != null ? gcn.hashCode() : 0);
+        int result = gcn != null ? gcn.hashCode() : 0;
+//        result = 31 * result + (custRefId != null ? custRefId.hashCode() : 0);
         result = 31 * result + (categoryAlias != null ? categoryAlias.hashCode() : 0);
         result = 31 * result + (accountNumber != null ? accountNumber.hashCode() : 0);
         result = 31 * result + (aliasNumber != null ? aliasNumber.hashCode() : 0);
@@ -142,7 +144,7 @@ public class PermataAliasAccount {
 //public class PermataAliasAccount {
 //    private long idAlias;
 //    private String userId;
-//    private String gcn;
+//    private String custRefId;
 //    private String categoryAlias;
 //    private String accountNumber;
 //    private String aliasNumber;
@@ -174,12 +176,12 @@ public class PermataAliasAccount {
 //
 //    @Id
 //    @Column(name = "GCN")
-//    public String getGcn() {
-//        return gcn;
+//    public String getCustRefId() {
+//        return custRefId;
 //    }
 //
-//    public void setGcn(String gcn) {
-//        this.gcn = gcn;
+//    public void setCustRefId(String custRefId) {
+//        this.custRefId = custRefId;
 //    }
 //
 //    @Id
@@ -272,7 +274,7 @@ public class PermataAliasAccount {
 //
 //        if (idAlias != that.idAlias) return false;
 //        if (userId != null ? !userId.equals(that.userId) : that.userId != null) return false;
-//        if (gcn != null ? !gcn.equals(that.gcn) : that.gcn != null) return false;
+//        if (custRefId != null ? !custRefId.equals(that.custRefId) : that.custRefId != null) return false;
 //        if (categoryAlias != null ? !categoryAlias.equals(that.categoryAlias) : that.categoryAlias != null)
 //            return false;
 //        if (accountNumber != null ? !accountNumber.equals(that.accountNumber) : that.accountNumber != null)
@@ -293,7 +295,7 @@ public class PermataAliasAccount {
 //    public int hashCode() {
 //        int result = (int) (idAlias ^ (idAlias >>> 32));
 //        result = 31 * result + (userId != null ? userId.hashCode() : 0);
-//        result = 31 * result + (gcn != null ? gcn.hashCode() : 0);
+//        result = 31 * result + (custRefId != null ? custRefId.hashCode() : 0);
 //        result = 31 * result + (categoryAlias != null ? categoryAlias.hashCode() : 0);
 //        result = 31 * result + (accountNumber != null ? accountNumber.hashCode() : 0);
 //        result = 31 * result + (aliasNumber != null ? aliasNumber.hashCode() : 0);

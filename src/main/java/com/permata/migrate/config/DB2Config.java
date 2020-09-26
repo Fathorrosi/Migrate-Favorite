@@ -50,6 +50,8 @@ public class DB2Config {
 				env.getProperty("logging.level.org.springframework.boot"));
 		properties.put("spring.main",
 				env.getProperty("spring.main.banner-mode"));
+		properties.put("hibernate.hbm2ddl.auto",
+				env.getProperty("spring.jpa.hibernate.ddl-auto"));
 		em.setJpaPropertyMap(properties);
 		return em;
 	}

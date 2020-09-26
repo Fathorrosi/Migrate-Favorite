@@ -1,15 +1,16 @@
 package com.permata.migrate.entity.db2;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
+import java.sql.Blob;
 import java.sql.Timestamp;
-import java.util.Arrays;
 
 /**
  * Created by HP on 10/10/2019.
  */
+//@Entity
+//@Table(name = "PERMATA_FAVORITE_SIMULATE", schema = "SONEDBA", catalog = "")
 @Entity
-@Table(name = "PERMATA_FAVORITE", schema = "SONEDBA", catalog = "")
+@Table(name = "PERMATA_FAVORITE_SIMULATE")
 public class PermataFavorite {
     private long idFav;
     private String transactionType;
@@ -23,7 +24,6 @@ public class PermataFavorite {
     private Timestamp createdTimestamp;
     private String idFavImage;
     private String imageExist;
-    private byte[] imageData;
     private String institutionCode;
     private String memo;
     private String sourceAccount;
@@ -31,6 +31,7 @@ public class PermataFavorite {
     private Timestamp updatedTimestamp;
     private String status;
     private String currency;
+    private java.sql.Blob imageData;
 
     @Id
     @Column(name = "ID_FAV")
@@ -43,7 +44,7 @@ public class PermataFavorite {
     }
 
     @Basic
-    @Column(name = "TRANSACTION_TYPE")
+    @Column(name = "TRANSACTION_TYPE", nullable = false, length = 50)
     public String getTransactionType() {
         return transactionType;
     }
@@ -53,7 +54,7 @@ public class PermataFavorite {
     }
 
     @Basic
-    @Column(name = "SUB_TRANSACTION_TYPE")
+    @Column(name = "SUB_TRANSACTION_TYPE", nullable = false, length = 50)
     public String getSubTransactionType() {
         return subTransactionType;
     }
@@ -63,7 +64,7 @@ public class PermataFavorite {
     }
 
     @Basic
-    @Column(name = "GCN")
+    @Column(name = "CIF", nullable = false , length = 50)
     public String getGcn() {
         return gcn;
     }
@@ -73,7 +74,7 @@ public class PermataFavorite {
     }
 
     @Basic
-    @Column(name = "DESTINATION_NUMBER")
+    @Column(name = "DESTINATION_NUMBER", nullable = false, length = 50)
     public String getDestinationNumber() {
         return destinationNumber;
     }
@@ -93,7 +94,7 @@ public class PermataFavorite {
     }
 
     @Basic
-    @Column(name = "ALIAS_NAME")
+    @Column(name = "ALIAS_NAME", nullable = false, length = 50)
     public String getAliasName() {
         return aliasName;
     }
@@ -152,15 +153,26 @@ public class PermataFavorite {
         this.imageExist = imageExist;
     }
 
+
+
+
     @Basic
-    @Column(name = "IMAGE_DATA")
-    public byte[] getImageData() {
+    @Lob
+    @Column(name = "IMAGE_DATA", columnDefinition = "BLOB", updatable = true)
+
+    public Blob getImageData() {
         return imageData;
     }
 
-    public void setImageData(byte[] imageData) {
+    public void setImageData(Blob imageData) {
         this.imageData = imageData;
     }
+
+    //    @Basic
+//    @Column(name = "IMAGE_DATA")
+//    public byte[] getImageData() {
+//        return imageData;
+//    }
 
     @Basic
     @Column(name = "INSTITUTION_CODE")
@@ -255,7 +267,7 @@ public class PermataFavorite {
             return false;
         if (idFavImage != null ? !idFavImage.equals(that.idFavImage) : that.idFavImage != null) return false;
         if (imageExist != null ? !imageExist.equals(that.imageExist) : that.imageExist != null) return false;
-        if (!Arrays.equals(imageData, that.imageData)) return false;
+        if (imageData != null ? !imageData.equals(that.imageData) : that.imageData != null) return false;
         if (institutionCode != null ? !institutionCode.equals(that.institutionCode) : that.institutionCode != null)
             return false;
         if (memo != null ? !memo.equals(that.memo) : that.memo != null) return false;
@@ -284,7 +296,7 @@ public class PermataFavorite {
         result = 31 * result + (createdTimestamp != null ? createdTimestamp.hashCode() : 0);
         result = 31 * result + (idFavImage != null ? idFavImage.hashCode() : 0);
         result = 31 * result + (imageExist != null ? imageExist.hashCode() : 0);
-        result = 31 * result + Arrays.hashCode(imageData);
+        result = 31 * result + (imageData != null ? imageData.hashCode() : 0);
         result = 31 * result + (institutionCode != null ? institutionCode.hashCode() : 0);
         result = 31 * result + (memo != null ? memo.hashCode() : 0);
         result = 31 * result + (sourceAccount != null ? sourceAccount.hashCode() : 0);

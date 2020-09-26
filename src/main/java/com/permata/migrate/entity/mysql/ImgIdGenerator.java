@@ -8,17 +8,17 @@ import javax.persistence.*;
 @Entity
 @Table(name = "img_id_generator")
 public class ImgIdGenerator {
-    private String gcn;
+    private String custRefId;
     private Integer sequence;
 
     @Id
-    @Column(name = "gcn", nullable = false, insertable = true, updatable = true, length = 100)
-    public String getGcn() {
-        return gcn;
+    @Column(name = "cust_ref_id", nullable = false, insertable = true, updatable = true, length = 100)
+    public String getCustRefId() {
+        return custRefId;
     }
 
-    public void setGcn(String gcn) {
-        this.gcn = gcn;
+    public void setCustRefId(String custRefId) {
+        this.custRefId = custRefId;
     }
 
     @Basic
@@ -38,7 +38,7 @@ public class ImgIdGenerator {
 
         ImgIdGenerator that = (ImgIdGenerator) o;
 
-        if (gcn != null ? !gcn.equals(that.gcn) : that.gcn != null) return false;
+        if (custRefId != null ? !custRefId.equals(that.custRefId) : that.custRefId != null) return false;
         if (sequence != null ? !sequence.equals(that.sequence) : that.sequence != null) return false;
 
         return true;
@@ -46,7 +46,7 @@ public class ImgIdGenerator {
 
     @Override
     public int hashCode() {
-        int result = gcn != null ? gcn.hashCode() : 0;
+        int result = custRefId != null ? custRefId.hashCode() : 0;
         result = 31 * result + (sequence != null ? sequence.hashCode() : 0);
         return result;
     }

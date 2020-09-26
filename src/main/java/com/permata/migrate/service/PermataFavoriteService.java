@@ -1,10 +1,13 @@
 package com.permata.migrate.service;
 
+import com.permata.migrate.conn.UpdateFavorite;
 import com.permata.migrate.entity.mysql.ImgIdGenerator;
 import com.permata.migrate.entity.mysql.PermataFavorite;
+import com.permata.migrate.entity.mysql2.Image;
 import com.permata.migrate.repository.db2.DB2PermataFavoriteRepository;
 import com.permata.migrate.repository.mysql.MySqlImgIdGeneratorRepository;
 import com.permata.migrate.repository.mysql.MySqlPermataFavoriteRepository;
+import com.permata.migrate.repository.mysql2.MySqlFavImageRepo;
 import com.permata.migrate.service.db2.DB2PermataFavoriteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,12 +33,16 @@ public class PermataFavoriteService {
     DB2PermataFavoriteService db2PermataFavoriteService;
     @Autowired
     MySqlPermataFavoriteRepository mySqlPermataFavoriteRepository;
+    @Autowired
+    MySqlFavImageRepo mySqlFavImageRepo;
 
 
-    List<String> tempImageGCN = new ArrayList<>();
-    int recordSizePerProcess;
-    int conterSavedRecord;
+    private List<String> tempImageCustRefId = new ArrayList<>();
+    private int recordSizePerProcess;
+    private int conterSavedRecord;
 
+    @Autowired
+    public UpdateFavorite updateFavorite;
 
     public PermataFavoriteService() {
     }
@@ -46,15 +53,17 @@ public class PermataFavoriteService {
 
 //        mySqlPermataFavoriteRepository.updateCollation();
 
-        //Priorities duplicate GCN record to be saved
-        insertDuplicateGcn();
+        //Priorities duplicate CustRefId record to be saved
+        insertDuplicateCustRefId();
 
-        //Continuing process for non duplicate GCN
+        //Continuing process for non duplicate CustRefId
         int totalPermataFavorite = db2PermataFavoriteRepository.countAllData();
 
         System.out.println("\n==================================================================");
         System.out.println(" Saving not duplicate GCN records ");
-        System.out.println("==================================================================\n");
+        System.out.println("==================================================================");
+
+        System.out.println("count data : "+db2PermataFavoriteRepository.countPermataFavoriteNotDuplicate());
 
         int remainingData = totalPermataFavorite % recordSizePerProcess;
         int totalFetchProcess = totalPermataFavorite / recordSizePerProcess;
@@ -77,20 +86,20 @@ public class PermataFavoriteService {
     }
 
     /*
-        Insert Duplicate GCN
-        Description : method for searching and saving duplicate GCN to optimize image id generation and migration process
+        Insert Duplicate CustRefId
+        Description : method for searching and saving duplicate CustRefId to optimize image id generation and migration process
      */
-    public void insertDuplicateGcn() {
+    public void insertDuplicateCustRefId() {
         System.out.println("\n==================================================================");
         System.out.println(" Saving duplicate GCN records ");
-        System.out.println("==================================================================\n");
+        System.out.println("==================================================================");
 
-        int sizeRecordWithDuplicateGcn = db2PermataFavoriteRepository.countRecordWithDuplicateGcn();
-        System.out.println("count data : "+sizeRecordWithDuplicateGcn);
+        int sizeRecordWithDuplicateCustRefId = db2PermataFavoriteRepository.countRecordWithDuplicateCustRefId();
+        System.out.println("count data : "+sizeRecordWithDuplicateCustRefId);
 
 
-        int remainingData = sizeRecordWithDuplicateGcn % recordSizePerProcess;
-        int totalFetchProcess = sizeRecordWithDuplicateGcn / recordSizePerProcess;
+        int remainingData = sizeRecordWithDuplicateCustRefId % recordSizePerProcess;
+        int totalFetchProcess = sizeRecordWithDuplicateCustRefId / recordSizePerProcess;
 
         for (int a = 1; a <= totalFetchProcess; a++) {
             System.out.println("==================================================================");
@@ -113,8 +122,12 @@ public class PermataFavoriteService {
     @Transactional
     public void savePermataFavoriteDuplicateBulk(int recordSizePerProcess) {
 
+        String idFav = "";
+        String whenIdFavImage = "";
+        String whenIsMigrate = "";
+
         List<com.permata.migrate.entity.mysql.PermataFavorite> ListPermataFavoriteMySql = new ArrayList<>();
-        List<com.permata.migrate.entity.db2.PermataFavorite> ListPermataFavoriteDB2 = new ArrayList<>();
+        List<Image> imageList = new ArrayList<>();
         List<com.permata.migrate.entity.mysql.ImgIdGenerator> ListImgIdGenerators = new ArrayList<>();
 
         boolean lastProcessRecord = false;
@@ -131,28 +144,28 @@ public class PermataFavoriteService {
 
 
             com.permata.migrate.entity.mysql.PermataFavorite permataFavoriteMySql = new com.permata.migrate.entity.mysql.PermataFavorite();
-            com.permata.migrate.entity.db2.PermataFavorite permataFavoriteDB2 = new com.permata.migrate.entity.db2.PermataFavorite();
+            Image image = new Image();
             ImgIdGenerator imgIdGenerator = new ImgIdGenerator();
 
             //Make Id_Fave_Img and Insert Table Img_Id_Generator
             String idFavImage;
             int seq = 1;
 
-            //Check and Set Frequency GCN
-            int frequencyDuplicateGCN = Collections.frequency(tempImageGCN, permataFavorites.get(i).getGcn());
-            seq = seq + frequencyDuplicateGCN;
+            //Check and Set Frequency CustRefId
+            int frequencyDuplicateCustRefId = Collections.frequency(tempImageCustRefId, permataFavorites.get(i).getGcn());
+            seq = seq + frequencyDuplicateCustRefId;
 
-            imgIdGenerator.setGcn(permataFavorites.get(i).getGcn());
+            imgIdGenerator.setCustRefId(permataFavorites.get(i).getGcn());
             imgIdGenerator.setSequence(seq);
             ListImgIdGenerators.add(imgIdGenerator);
 
             idFavImage = permataFavorites.get(i).getGcn() + String.format("%04d", seq);
 
 
-            //prepare in list for insert to MySql
+            //prepare insert to MySql
             permataFavoriteMySql.setTransactionType(permataFavorites.get(i).getTransactionType());
             permataFavoriteMySql.setSubTransactionType(permataFavorites.get(i).getSubTransactionType());
-            permataFavoriteMySql.setGcn(permataFavorites.get(i).getGcn());
+            permataFavoriteMySql.setCustRefId(permataFavorites.get(i).getGcn());
             permataFavoriteMySql.setDestinationNumber(permataFavorites.get(i).getDestinationNumber());
             permataFavoriteMySql.setAction(permataFavorites.get(i).getAction());
             permataFavoriteMySql.setAliasName(permataFavorites.get(i).getAliasName());
@@ -168,40 +181,45 @@ public class PermataFavoriteService {
             permataFavoriteMySql.setUpdatedTimestamp(permataFavorites.get(i).getUpdatedTimestamp());
             permataFavoriteMySql.setUpdatedBy(permataFavorites.get(i).getUpdatedBy());
             permataFavoriteMySql.setCurrency(permataFavorites.get(i).getCurrency());
+//            permataFavoriteMySql.setImageData(permataFavorites.get(i).getImageData());
 
             ListPermataFavoriteMySql.add(permataFavoriteMySql);
 
+            //prepare insert Image to MySql
+
+
             //update ID_Fav_Img & Status in DB2
-            permataFavoriteDB2.setIdFav(permataFavorites.get(i).getIdFav());
-            permataFavoriteDB2.setTransactionType(permataFavorites.get(i).getTransactionType());
-            permataFavoriteDB2.setSubTransactionType(permataFavorites.get(i).getSubTransactionType());
-            permataFavoriteDB2.setGcn(permataFavorites.get(i).getGcn());
-            permataFavoriteDB2.setDestinationNumber(permataFavorites.get(i).getDestinationNumber());
-            permataFavoriteDB2.setAction(permataFavorites.get(i).getAction());
-            permataFavoriteDB2.setAliasName(permataFavorites.get(i).getAliasName());
-            permataFavoriteDB2.setAmount(permataFavorites.get(i).getAmount());
-            permataFavoriteDB2.setCreatedBy(permataFavorites.get(i).getCreatedBy());
-            permataFavoriteDB2.setCreatedTimestamp(permataFavorites.get(i).getCreatedTimestamp());
-            permataFavoriteDB2.setIdFavImage(idFavImage);
-            permataFavoriteDB2.setImageExist(permataFavorites.get(i).getImageExist());
-            permataFavoriteDB2.setImageData(permataFavorites.get(i).getImageData());
-            permataFavoriteDB2.setInstitutionCode(permataFavorites.get(i).getInstitutionCode());
-            permataFavoriteDB2.setMemo(permataFavorites.get(i).getMemo());
-            permataFavoriteDB2.setSourceAccount(permataFavorites.get(i).getSourceAccount());
-            permataFavoriteDB2.setUpdatedBy(permataFavorites.get(i).getUpdatedBy());
-            permataFavoriteDB2.setUpdatedTimestamp(permataFavorites.get(i).getUpdatedTimestamp());
-            permataFavoriteDB2.setStatus("Y");
-            permataFavoriteDB2.setCurrency(permataFavorites.get(i).getCurrency());
+            image.setIdFav(permataFavorites.get(i).getIdFav());
+            image.setIdImage(idFavImage);
+            image.setImage(permataFavorites.get(i).getImageData());
+            image.setCreated_date(permataFavorites.get(i).getCreatedTimestamp());
+            image.setCreated_by(permataFavorites.get(i).getCreatedBy());
+            image.setLast_modified_by(permataFavorites.get(i).getUpdatedBy());
+            image.setLast_modified_date(permataFavorites.get(i).getUpdatedTimestamp());
 
-            ListPermataFavoriteDB2.add(permataFavoriteDB2);
+            imageList.add(image);
 
-            if (lastProcessRecord == false && tempImageGCN.size() != 0) {
-                if (!permataFavorites.get(i).getGcn().equals(tempImageGCN.get(tempImageGCN.size() - 1))) {
-                    tempImageGCN.clear();
+            // Prepare Update DB2
+            if (idFav == ""){
+                idFav = idFav+permataFavorites.get(i).getIdFav()+",";
+            }
+            if(i==permataFavorites.size()-1){
+                idFav = idFav+permataFavorites.get(i).getIdFav();
+            }
+            else{
+                idFav = idFav+permataFavorites.get(i).getIdFav()+",";
+            }
+            whenIdFavImage = whenIdFavImage+" when "+permataFavorites.get(i).getIdFav()+" then '"+idFavImage+"'";
+            whenIsMigrate = whenIsMigrate+" when "+permataFavorites.get(i).getIdFav()+" then 'Y'";
+
+
+            if (lastProcessRecord == false && tempImageCustRefId.size() != 0) {
+                if (!permataFavorites.get(i).getGcn().equals(tempImageCustRefId.get(tempImageCustRefId.size() - 1))) {
+                    tempImageCustRefId.clear();
                 }
             }
 
-            tempImageGCN.add(permataFavorites.get(i).getGcn());
+            tempImageCustRefId.add(permataFavorites.get(i).getGcn());
 
 
         }
@@ -211,12 +229,15 @@ public class PermataFavoriteService {
 
         System.out.println("save MySql - Data = " + ListPermataFavoriteMySql.size());
         mySqlPermataFavoriteRepository.saveAll(ListPermataFavoriteMySql);
+        mySqlFavImageRepo.saveAll(imageList);
 
         System.out.println("save ImgIdGen - Data = " + ListImgIdGenerators.size());
         mySqlImgIdGeneratorRepository.saveAll(ListImgIdGenerators);
 
-        System.out.println("save DB2 - Data = " + ListPermataFavoriteDB2.size());
-        db2PermataFavoriteRepository.saveAll(ListPermataFavoriteDB2);
+        System.out.println("Update DB2");
+//        db2PermataFavoriteRepository.saveAll(ListPermataFavoriteDB2);
+//        System.exit(1);
+        updateFavorite.update(idFav,whenIdFavImage,whenIsMigrate);
 
         Timestamp timestamp2 = new java.sql.Timestamp((new Date().getTime()));
         System.out.println("Done at : " + timestamp2);
@@ -230,15 +251,20 @@ public class PermataFavoriteService {
 
     @Transactional
     public void savePermataFavorite(int data) {
+
+        String idFav = "";
+        String whenIdFavImage = "";
+        String whenIsMigrate = "";
+
         List<PermataFavorite> ListPermataFavoriteMySql = new ArrayList<>();
-        List<com.permata.migrate.entity.db2.PermataFavorite> ListPermataFavoriteDB2 = new ArrayList<>();
+        List<Image> imageList = new ArrayList<>();
         List<com.permata.migrate.entity.mysql.ImgIdGenerator> ListImgIdGenerators = new ArrayList<>();
 
-//        db1PermataFavoriteRepository.UpdateStatus2(data);
         Timestamp timestampp = new java.sql.Timestamp((new Date().getTime()));
         System.out.println("Fetch Data at : " + timestampp);
         List<com.permata.migrate.entity.db2.PermataFavorite> permataFavorites = db2PermataFavoriteRepository.getPermataFavorite(data);
         System.out.println("Size Get Data : " + permataFavorites.size());
+        System.out.println("Preparing Data..");
 
         Timestamp timestamp = new java.sql.Timestamp((new Date().getTime()));
         System.out.println("Start at : " + timestamp);
@@ -246,14 +272,14 @@ public class PermataFavoriteService {
         for (int i = 0; i < permataFavorites.size(); i++) {
 
             com.permata.migrate.entity.mysql.PermataFavorite permataFavoriteMySql = new com.permata.migrate.entity.mysql.PermataFavorite();
-            com.permata.migrate.entity.db2.PermataFavorite permataFavoriteDB2 = new com.permata.migrate.entity.db2.PermataFavorite();
+            Image image = new Image();
             ImgIdGenerator imgIdGenerator = new ImgIdGenerator();
 
             //Make Id_Fave_Img and Insert Table Img_Id_Generator
             String convertedSequence;
             int seq = 1;
 
-            imgIdGenerator.setGcn(permataFavorites.get(i).getGcn());
+            imgIdGenerator.setCustRefId(permataFavorites.get(i).getGcn());
             imgIdGenerator.setSequence(seq);
             ListImgIdGenerators.add(imgIdGenerator);
 
@@ -263,7 +289,7 @@ public class PermataFavoriteService {
             //prepare in list for insert to MySql
             permataFavoriteMySql.setTransactionType(permataFavorites.get(i).getTransactionType());
             permataFavoriteMySql.setSubTransactionType(permataFavorites.get(i).getSubTransactionType());
-            permataFavoriteMySql.setGcn(permataFavorites.get(i).getGcn());
+            permataFavoriteMySql.setCustRefId(permataFavorites.get(i).getGcn());
             permataFavoriteMySql.setDestinationNumber(permataFavorites.get(i).getDestinationNumber());
             permataFavoriteMySql.setAction(permataFavorites.get(i).getAction());
             permataFavoriteMySql.setAliasName(permataFavorites.get(i).getAliasName());
@@ -279,32 +305,34 @@ public class PermataFavoriteService {
             permataFavoriteMySql.setUpdatedTimestamp(permataFavorites.get(i).getUpdatedTimestamp());
             permataFavoriteMySql.setUpdatedBy(permataFavorites.get(i).getUpdatedBy());
             permataFavoriteMySql.setCurrency(permataFavorites.get(i).getCurrency());
+//            permataFavoriteMySql.setImageData(permataFavorites.get(i).getImageData());
 
             ListPermataFavoriteMySql.add(permataFavoriteMySql);
 
             //update ID_Fav_Img & Status in DB2
-            permataFavoriteDB2.setIdFav(permataFavorites.get(i).getIdFav());
-            permataFavoriteDB2.setTransactionType(permataFavorites.get(i).getTransactionType());
-            permataFavoriteDB2.setSubTransactionType(permataFavorites.get(i).getSubTransactionType());
-            permataFavoriteDB2.setGcn(permataFavorites.get(i).getGcn());
-            permataFavoriteDB2.setDestinationNumber(permataFavorites.get(i).getDestinationNumber());
-            permataFavoriteDB2.setAction(permataFavorites.get(i).getAction());
-            permataFavoriteDB2.setAliasName(permataFavorites.get(i).getAliasName());
-            permataFavoriteDB2.setAmount(permataFavorites.get(i).getAmount());
-            permataFavoriteDB2.setCreatedBy(permataFavorites.get(i).getCreatedBy());
-            permataFavoriteDB2.setCreatedTimestamp(permataFavorites.get(i).getCreatedTimestamp());
-            permataFavoriteDB2.setIdFavImage(convertedSequence);
-            permataFavoriteDB2.setImageExist(permataFavorites.get(i).getImageExist());
-            permataFavoriteDB2.setImageData(permataFavorites.get(i).getImageData()); //?
-            permataFavoriteDB2.setInstitutionCode(permataFavorites.get(i).getInstitutionCode());
-            permataFavoriteDB2.setMemo(permataFavorites.get(i).getMemo());
-            permataFavoriteDB2.setSourceAccount(permataFavorites.get(i).getSourceAccount());
-            permataFavoriteDB2.setUpdatedBy(permataFavorites.get(i).getUpdatedBy());
-            permataFavoriteDB2.setUpdatedTimestamp(permataFavorites.get(i).getUpdatedTimestamp());
-            permataFavoriteDB2.setStatus("Y");
-            permataFavoriteDB2.setCurrency(permataFavorites.get(i).getCurrency());
+            image.setIdFav(permataFavorites.get(i).getIdFav());
+            image.setIdImage(convertedSequence);
+            image.setImage(permataFavorites.get(i).getImageData());
+            image.setCreated_date(permataFavorites.get(i).getCreatedTimestamp());
+            image.setCreated_by(permataFavorites.get(i).getCreatedBy());
+            image.setLast_modified_by(permataFavorites.get(i).getUpdatedBy());
+            image.setLast_modified_date(permataFavorites.get(i).getUpdatedTimestamp());
 
-            ListPermataFavoriteDB2.add(permataFavoriteDB2);
+            imageList.add(image);
+
+
+            if (idFav == ""){
+                idFav = idFav+permataFavorites.get(i).getIdFav()+",";
+            }
+            if(i==permataFavorites.size()-1){
+                idFav = idFav+permataFavorites.get(i).getIdFav();
+            }
+            else{
+                idFav = idFav+permataFavorites.get(i).getIdFav()+",";
+            }
+            whenIdFavImage = whenIdFavImage+" when "+permataFavorites.get(i).getIdFav()+" then '"+convertedSequence+"'";
+            whenIsMigrate = whenIsMigrate+" when "+permataFavorites.get(i).getIdFav()+" then 'Y'";
+
 
         }
         //Save record to DB
@@ -313,17 +341,54 @@ public class PermataFavoriteService {
 
         System.out.println("save MySql - Data = " + ListPermataFavoriteMySql.size());
         mySqlPermataFavoriteRepository.saveAll(ListPermataFavoriteMySql);
+        mySqlFavImageRepo.saveAll(imageList);
+
         System.out.println("save ImgIdGen - Data = " + ListImgIdGenerators.size());
         mySqlImgIdGeneratorRepository.saveAll(ListImgIdGenerators);
-        System.out.println("save DB2 - Data = " + ListPermataFavoriteDB2.size());
-        db2PermataFavoriteRepository.saveAll(ListPermataFavoriteDB2);
+
+        System.out.println("update DB2");
+        updateFavorite.update(idFav,whenIdFavImage,whenIsMigrate);
 
         Timestamp timestamp2 = new java.sql.Timestamp((new Date().getTime()));
         System.out.println("Done at : " + timestamp2);
 
         conterSavedRecord = conterSavedRecord + ListPermataFavoriteMySql.size();
-        System.out.println("\n Saved data : " + conterSavedRecord);
+        System.out.println("\nSaved data : " + conterSavedRecord);
         System.out.println();
 
     }
+
+        public void inpuDataPermataFavorite() {
+        List<com.permata.migrate.entity.db2.PermataFavorite> ListPermataFavoriteDB2 = new ArrayList<>();
+//        com.permata.migrate.entity.db2.PermataFavorite permataFavorite = db2PermataFavoriteRepository.getPermataFavorite();
+        for (int i = 1; i <= 10; i++) {
+            com.permata.migrate.entity.db2.PermataFavorite permataFavoriteDB2 = new com.permata.migrate.entity.db2.PermataFavorite();
+            permataFavoriteDB2.setAction("testing");
+            permataFavoriteDB2.setAliasName("testing"+i);
+            permataFavoriteDB2.setAmount(1);
+            permataFavoriteDB2.setCreatedBy("rosi");
+            permataFavoriteDB2.setCreatedTimestamp(Timestamp.valueOf("2019-10-22 23:27:18"));
+            permataFavoriteDB2.setDestinationNumber("testingg"+i);
+            permataFavoriteDB2.setGcn("gcn" + i);
+            permataFavoriteDB2.setIdFav(i);
+            permataFavoriteDB2.setImageExist("Y");
+            permataFavoriteDB2.setInstitutionCode("testing");
+            permataFavoriteDB2.setMemo("testing");
+            permataFavoriteDB2.setSourceAccount("testing");
+            permataFavoriteDB2.setUpdatedTimestamp(Timestamp.valueOf("2019-10-22 23:27:18"));
+            permataFavoriteDB2.setSubTransactionType("testingg"+i);
+            permataFavoriteDB2.setTransactionType("testingg " + i);
+            permataFavoriteDB2.setIdFavImage("null");
+            permataFavoriteDB2.setUpdatedBy("rosi");
+            permataFavoriteDB2.setStatus(null);
+//            permataFavoriteDB2.setImageData(permataFavorite.getImageData());
+
+
+
+            ListPermataFavoriteDB2.add(permataFavoriteDB2);
+
+        }
+            db2PermataFavoriteRepository.saveAll(ListPermataFavoriteDB2);
+    }
 }
+

@@ -1,9 +1,6 @@
 package com.permata.migrate.entity.mysql;
 
-import org.hibernate.validator.constraints.UniqueElements;
-
 import javax.persistence.*;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 
 /**
@@ -13,7 +10,7 @@ import java.sql.Timestamp;
 @Table(name = "permata_alias_account")
 @IdClass(PermataAliasAccountPK.class)
 public class PermataAliasAccount {
-    private String gcn;
+    private String custRefId;
     private String categoryAlias;
     private String accountNumber;
     private String aliasName;
@@ -23,13 +20,13 @@ public class PermataAliasAccount {
     private Timestamp updatedTimestamp;
 
     @Id
-    @Column(name = "gcn", nullable = false, insertable = true, updatable = true, length = 50)
-    public String getGcn() {
-        return gcn;
+    @Column(name = "CUST_REF_ID", nullable = false, insertable = true, updatable = true, length = 50)
+    public String getCustRefId() {
+        return custRefId;
     }
 
-    public void setGcn(String gcn) {
-        this.gcn = gcn;
+    public void setCustRefId(String custRefId) {
+        this.custRefId = custRefId;
     }
 
     @Id
@@ -109,7 +106,7 @@ public class PermataAliasAccount {
 
         PermataAliasAccount that = (PermataAliasAccount) o;
 
-        if (gcn != null ? !gcn.equals(that.gcn) : that.gcn != null) return false;
+        if (custRefId != null ? !custRefId.equals(that.custRefId) : that.custRefId != null) return false;
         if (categoryAlias != null ? !categoryAlias.equals(that.categoryAlias) : that.categoryAlias != null)
             return false;
         if (accountNumber != null ? !accountNumber.equals(that.accountNumber) : that.accountNumber != null)
@@ -127,7 +124,7 @@ public class PermataAliasAccount {
 
     @Override
     public int hashCode() {
-        int result = gcn != null ? gcn.hashCode() : 0;
+        int result = custRefId != null ? custRefId.hashCode() : 0;
         result = 31 * result + (categoryAlias != null ? categoryAlias.hashCode() : 0);
         result = 31 * result + (accountNumber != null ? accountNumber.hashCode() : 0);
         result = 31 * result + (aliasName != null ? aliasName.hashCode() : 0);

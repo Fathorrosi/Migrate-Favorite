@@ -17,23 +17,8 @@ import java.util.List;
 @Repository
 public interface MySqlImgIdGeneratorRepository extends JpaRepository<ImgIdGenerator, Long> {
 
-    //    String a = "testing";
-//
-//    @Query(value = "SELECT COUNT(*) FROM IMG_ID_GENERATOR WHERE GCN =:gcn",nativeQuery = true)
-//    String checkGcn(@Param("gcn") String getCountGcn);
-//
-//    @Query(value = "SELECT SEQUENCE FROM IMG_ID_GENERATOR WHERE GCN =:gcn",nativeQuery = true)
-//    String getSequence(@Param("gcn") String getCountGcn);
-//
-//    @Transactional
-//    @Modifying
-//    @Query(value = "INSERT INTO img_id_generator(gcn, sequence) \n" +
-//            "\tselect gcn,  \n" +
-//            "\t(SELECT count(GCN) FROM PERMATA_FAVORITE GROUP BY GCN\n" +
-//            "GO",nativeQuery = true)
-//    public void saveImgIdGen();
     @Transactional
     @Modifying
-    @Query(value = "SELECT SEQUENCE FROM IMG_ID_GENERATOR WHERE GCN =:gcn", nativeQuery = true)
-    int getSequence(@Param("gcn") String getCountGcn);
+    @Query(value = "SELECT SEQUENCE FROM IMG_ID_GENERATOR WHERE cust_ref_id =:cust_ref_id", nativeQuery = true)
+    int getSequence(@Param("cust_ref_id") String getCountcust_ref_id);
 }

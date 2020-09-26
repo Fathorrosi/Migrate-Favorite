@@ -1,11 +1,15 @@
 package com.permata.migrate.ui;
 
+import com.permata.migrate.conn.UpdateFavorite;
+import com.permata.migrate.repository.db2.DB2PermataFavoriteRepository;
 import com.permata.migrate.service.PermataAliasAccountService;
 import com.permata.migrate.service.PermataFavoriteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -13,11 +17,11 @@ import java.util.Scanner;
  */
 @Component
 public class ConsoleView implements CommandLineRunner {
+
     int optionAction;
     int optionSetProcessLimit;
     int optionStartProcess;
     int optionMigration;
-
     int dataProcessLimit = 10000;
 
     //int data;
@@ -28,13 +32,19 @@ public class ConsoleView implements CommandLineRunner {
     @Autowired
     PermataAliasAccountService permataAliasAccountService;
 
+    @Autowired
+    DB2PermataFavoriteRepository db2PermataFavoriteRepository;
+
     public ConsoleView() {
 
     }
 
     @Override
     public void run(String... args) throws Exception {
-//        System.out.print("command line runner");
+
+//        permataFavoriteService.inpuDataPermataFavorite();
+//        permataAliasAccountService.inpuDataPermataAliasAccount();
+
         do {
             Scanner input = new Scanner(System.in);
 
@@ -127,6 +137,7 @@ public class ConsoleView implements CommandLineRunner {
                     break;
                 case 2:
                     System.out.println("Thank You\n");
+                    System.exit(-1);
                     break;
                 default:
                     System.out.println("Invalid selection\n");

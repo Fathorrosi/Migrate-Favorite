@@ -27,7 +27,7 @@ public class DB2PermataFavoriteServiceImpl implements DB2PermataFavoriteService 
 
     @Override
     public List<PermataFavorite> getPermataFavoriteByGcn(String gcn) {
-        return db2PermataFavoriteRepository.getPermataFavoriteByGcn(gcn);
+        return db2PermataFavoriteRepository.getPermataFavoriteBycustRefId(gcn);
     }
 
     @Override

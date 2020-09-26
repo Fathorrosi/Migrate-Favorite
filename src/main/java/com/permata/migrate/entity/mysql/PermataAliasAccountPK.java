@@ -8,18 +8,18 @@ import java.io.Serializable;
  * Created by HP on 04/11/2019.
  */
 public class PermataAliasAccountPK implements Serializable {
-    private String gcn;
+    private String custRefId;
     private String categoryAlias;
     private String accountNumber;
 
-    @Column(name = "gcn", nullable = false, insertable = true, updatable = true, length = 50)
+    @Column(name = "CUST_REF_ID", nullable = false, insertable = true, updatable = true, length = 50)
     @Id
-    public String getGcn() {
-        return gcn;
+    public String getCustRefId() {
+        return custRefId;
     }
 
-    public void setGcn(String gcn) {
-        this.gcn = gcn;
+    public void setCustRefId(String custRefId) {
+        this.custRefId = custRefId;
     }
 
     @Column(name = "category_alias", nullable = false, insertable = true, updatable = true, length = 10)
@@ -49,7 +49,7 @@ public class PermataAliasAccountPK implements Serializable {
 
         PermataAliasAccountPK that = (PermataAliasAccountPK) o;
 
-        if (gcn != null ? !gcn.equals(that.gcn) : that.gcn != null) return false;
+        if (custRefId != null ? !custRefId.equals(that.custRefId) : that.custRefId != null) return false;
         if (categoryAlias != null ? !categoryAlias.equals(that.categoryAlias) : that.categoryAlias != null)
             return false;
         if (accountNumber != null ? !accountNumber.equals(that.accountNumber) : that.accountNumber != null)
@@ -60,7 +60,7 @@ public class PermataAliasAccountPK implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = gcn != null ? gcn.hashCode() : 0;
+        int result = custRefId != null ? custRefId.hashCode() : 0;
         result = 31 * result + (categoryAlias != null ? categoryAlias.hashCode() : 0);
         result = 31 * result + (accountNumber != null ? accountNumber.hashCode() : 0);
         return result;

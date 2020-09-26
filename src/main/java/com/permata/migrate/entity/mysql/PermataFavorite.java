@@ -1,9 +1,8 @@
 package com.permata.migrate.entity.mysql;
 
-import org.hibernate.dialect.MySQL8Dialect;
-
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.sql.Blob;
 import java.sql.Timestamp;
 
 /**
@@ -15,7 +14,7 @@ import java.sql.Timestamp;
 public class PermataFavorite {
     private String transactionType;
     private String subTransactionType;
-    private String gcn;
+    private String custRefId;
     private String destinationNumber;
     private String action;
     private String aliasName;
@@ -31,6 +30,8 @@ public class PermataFavorite {
     private String updatedBy;
     private Timestamp updatedTimestamp;
     private String currency;
+//    public Blob imageData;
+
 
     @Id
     @Column(name = "transaction_type", nullable = false, insertable = true, updatable = true, columnDefinition="VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_bin")
@@ -53,13 +54,13 @@ public class PermataFavorite {
     }
 
     @Id
-    @Column(name = "gcn", nullable = false, insertable = true, updatable = true, columnDefinition="VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_bin")
-    public String getGcn() {
-        return gcn;
+    @Column(name = "CUST_REF_ID", nullable = false, insertable = true, updatable = true, columnDefinition="VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_bin")
+    public String getCustRefId() {
+        return custRefId;
     }
 
-    public void setGcn(String gcn) {
-        this.gcn = gcn;
+    public void setCustRefId(String custRefId) {
+        this.custRefId = custRefId;
     }
 
     @Id
@@ -93,7 +94,7 @@ public class PermataFavorite {
     }
 
     @Basic
-    @Column(name = "amount", nullable = true, insertable = true, updatable = true, precision = 2)
+    @Column(name = "amount", nullable = true, insertable = true, updatable = true, precision = 10, scale = 2)
     public BigDecimal getAmount() {
         return amount;
     }
@@ -123,7 +124,7 @@ public class PermataFavorite {
     }
 
     @Basic
-    @Column(name = "id_fav", unique = true , nullable = false, insertable = true, updatable = true, columnDefinition = "serial")
+    @Column(name = "id_fav",  nullable = false, insertable = true, updatable = true, columnDefinition = "serial")
     public long getIdFav() {
         return idFav;
     }
@@ -203,7 +204,7 @@ public class PermataFavorite {
     }
 
     @Basic
-    @Column(name = "currency", nullable = false, insertable = true, updatable = true, length = 30)
+    @Column(name = "currency", nullable = true, insertable = true, updatable = true, length = 30)
     public String getCurrency() {
         return currency;
     }
@@ -211,6 +212,18 @@ public class PermataFavorite {
     public void setCurrency(String currency) {
         this.currency = currency;
     }
+
+//    @Basic
+//    @Lob
+//    @Column(name = "image_data", columnDefinition = "LONGBLOB")
+
+//    public Blob getImageData() {
+//        return imageData;
+//    }
+//
+//    public void setImageData(Blob imageData) {
+//        this.imageData = imageData;
+//    }
 
 //    @Override
 //    public boolean equals(Object o) {
@@ -224,7 +237,7 @@ public class PermataFavorite {
 //            return false;
 //        if (subTransactionType != null ? !subTransactionType.equals(that.subTransactionType) : that.subTransactionType != null)
 //            return false;
-//        if (gcn != null ? !gcn.equals(that.gcn) : that.gcn != null) return false;
+//        if (custRefId != null ? !custRefId.equals(that.custRefId) : that.custRefId != null) return false;
 //        if (destinationNumber != null ? !destinationNumber.equals(that.destinationNumber) : that.destinationNumber != null)
 //            return false;
 //        if (action != null ? !action.equals(that.action) : that.action != null) return false;
@@ -252,7 +265,7 @@ public class PermataFavorite {
 //    public int hashCode() {
 //        int result = transactionType != null ? transactionType.hashCode() : 0;
 //        result = 31 * result + (subTransactionType != null ? subTransactionType.hashCode() : 0);
-//        result = 31 * result + (gcn != null ? gcn.hashCode() : 0);
+//        result = 31 * result + (custRefId != null ? custRefId.hashCode() : 0);
 //        result = 31 * result + (destinationNumber != null ? destinationNumber.hashCode() : 0);
 //        result = 31 * result + (action != null ? action.hashCode() : 0);
 //        result = 31 * result + (aliasName != null ? aliasName.hashCode() : 0);

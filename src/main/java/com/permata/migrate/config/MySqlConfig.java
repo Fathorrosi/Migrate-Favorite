@@ -22,8 +22,8 @@ import java.util.HashMap;
 public class MySqlConfig {
 	@Autowired
 	private Environment env;
-	@Bean
 	@Primary
+	@Bean
 	public LocalContainerEntityManagerFactoryBean db2EntityManager() {
 		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 		em.setDataSource(db2Datasource());

@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.permata</groupId>
-	<artifactId>db2tomysql</artifactId>
+	<artifactId>MigrateFavorite</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>DB2toMySql</name>
+	<name>MigrateFavorite</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
@@ -50,8 +50,8 @@
 		</dependency>
 		<dependency>
 			<groupId>com.ibm.db2.jcc</groupId>
-			<artifactId>db2jcc4</artifactId>
-			<version>10.1</version>
+			<artifactId>db2jcc</artifactId>
+			<version>db2jcc4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
